@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM-Based XSS Demo</title>
+    <style>
+        /* Reset for consistent styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Body styling */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #f0f2f5, #c4d4f2);
+            color: #333;
+        }
+
+        /* Container styling */
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        /* Heading styling */
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Form input styling */
+        label {
+            display: block;
+            font-weight: bold;
+            color: #444;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        /* Button styling */
+        button {
+            width: 100%;
+            padding: 10px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Display message styling */
+        #domDisplay {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>DOM-Based XSS Test</h2>
+
+        <!-- Vulnerable Form -->
+        <form id="domXssForm">
+            <label for="domMessage">Enter a Message (Vulnerable):</label>
+            <input type="text" id="domMessage" name="message" required>
+            <button type="button" onclick="showDomMessage()">Show Message (Vulnerable)</button>
+        </form>
+
+        <div id="domDisplay"></div>
+        <br>
+
+        <!-- Secure Form -->
+        <form id="safeDomXssForm">
+            <label for="safeDomMessage">Enter a Message (Safe):</label>
+            <input type="text" id="safeDomMessage" name="message" required>
+            <button type="button" onclick="showSafeDomMessage()">Show Message (Safe)</button>
+        </form>
+
+        <div id="safeDomDisplay"></div>
+    </div>
+
+    <script>
+        // Vulnerable to DOM-based XSS
+        function showDomMessage() {
+            const message = document.getElementById('domMessage').value;
+            document.getElementById('domDisplay').innerHTML = `User message: ${message}`; // Injecting raw HTML
+        }
+
+        // Secure against DOM-based XSS
+        function showSafeDomMessage() {
+            const safeMessage = document.getElementById('safeDomMessage').value;
+            document.getElementById('safeDomDisplay').textContent = `User message: ${safeMessage}`; // Using textContent for safe rendering
+        }
+    </script>
+</body>
+
+</html>

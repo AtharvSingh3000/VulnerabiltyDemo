@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XSS Demo</title>
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Body styling */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f4f7fc;
+            color: #333;
+        }
+
+        /* Container styling */
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Heading styling */
+        h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Label styling */
+        label {
+            font-size: 16px;
+            color: #555;
+            display: block;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        /* Input field styling */
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        /* Button styling */
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Result iframe styling */
+        #xssResult {
+            margin-top: 20px;
+            display: none;
+            width: 100%;
+            height: 150px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>XSS Test</h2>
+
+        <!-- Vulnerable Form -->
+        <form id="xssForm">
+            <label for="message">Enter a Message (Vulnerable):</label>
+            <input type="text" id="message" name="message" required>
+            <br><br>
+            <button type="button" onclick="sendMessage()">Send Message (Vulnerable)</button>
+        </form>
+        <br>
+        
+        <h2>Safe Message</h2>
+
+        <!-- Safe Form (Preventing XSS) -->
+        <form id="safeXssForm">
+            <label for="safeMessage">Enter a Message (Safe):</label>
+            <input type="text" id="safeMessage" name="safeMessage" required>
+            <br><br>
+            <button type="button" onclick="sendSafeMessage()">Send Safe Message</button>
+        </form>
+        
+        <iframe id="xssResult" style="display:none; width:100%; height:300px;"></iframe>
+    </div>
+
+    <script>
+        // Function to send vulnerable message (XSS susceptible)
+        function sendMessage() {
+            const message = document.getElementById('message').value;
+            document.getElementById('xssResult').style.display = "block";
+            document.getElementById('xssResult').src = `/login/message?msg=${encodeURIComponent(message)}`;
+        }
+
+        // Function to send safe message (XSS protected)
+        function sendSafeMessage() {
+            const safeMessage = document.getElementById('safeMessage').value;
+            document.getElementById('xssResult').style.display = "block";
+            document.getElementById('xssResult').src = `/login/safe-message?msg=${encodeURIComponent(safeMessage)}`;
+        }
+    </script>
+</body>
+
+</html>

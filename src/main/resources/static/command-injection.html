@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Injection Demo</title>
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Body styling */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #f0f2f5, #d4e4f7);
+            color: #333;
+        }
+
+        /* Container styling */
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Heading styling */
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Form styling */
+        label {
+            display: block;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        /* Button styling */
+        button {
+            width: 100%;
+            padding: 10px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Message styling */
+        #commandMessage {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #e63946;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Command Injection Test</h2>
+
+        <!-- Vulnerable form -->
+        <form action="/login/execute" method="post" onsubmit="sendCommand(event, false)">
+            <h1>Command Injection (Vulnerable)</h1>
+            <label for="command">Command:</label>
+            <input type="text" id="command" name="command" required>
+            <button type="submit">Execute Command (Vulnerable)</button>
+        </form>
+        
+        <!-- Secure form -->
+        <form action="/login/secure-execute" method="post" onsubmit="sendCommand(event, true)">
+            <h1>Command Execution (Secure)</h1>
+            <label for="command">Command:</label>
+            <input type="text" id="command-secure" name="command" required>
+            <button type="submit">Execute Command (Secure)</button>
+        </form>
+        
+    </div>
+
+    <script>
+        // Function to send the command through fetch
+        function sendCommand(event, isSecure) {
+            event.preventDefault(); // Prevent form submission
+            
+            // Get the command value based on the form being used
+            const command = isSecure ? document.getElementById('command-secure').value : document.getElementById('command').value;
+
+            // Set the endpoint based on the form type
+            const url = isSecure ? '/login/secure-execute' : '/login/execute';
+            
+            // Send command via Fetch API
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `command=${encodeURIComponent(command)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error executing command');
+                }
+                return response.text();
+            })
+            .then(data => {
+                alert(data); // Show the command output in a popup
+            })
+            .catch(error => {
+                alert('Error: ' + error.message); // Show error message in a popup
+            });
+        }
+    </script>
+</body>
+
+</html>
