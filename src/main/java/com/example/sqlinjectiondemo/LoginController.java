@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.HtmlUtils;
 
 import jakarta.persistence.EntityManager;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.List;
 
 @Controller
@@ -263,6 +265,27 @@ public String secureChangePassword(@RequestParam String username, @RequestParam 
                     + "</body></html>";
         }
     }  
+// Add a vulnerable SSRF endpoint
+@GetMapping("/fetch-resource")
+@ResponseBody
+public String fetchResource(@RequestParam String url) {
+    try {
+        // Make the server-side request to the provided URL
+        URL targetUrl = new URL(url);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(targetUrl.openStream()));
 
+        StringBuilder content = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            content.append(line).append("\n");
+        }
+        reader.close();
+
+        // Return the fetched content as the response
+        return "<html><body><h2>Fetched Content:</h2><pre>" + content + "</pre></body></html>";
+    } catch (Exception e) {
+        return "<html><body><h2>Error:</h2><p>" + e.getMessage() + "</p></body></html>";
+    }
+}
 
 }
