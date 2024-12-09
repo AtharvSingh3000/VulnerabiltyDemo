@@ -71,7 +71,7 @@
 
             // Send a POST request to the login endpoint (cross-site request)
             const form = document.createElement('form');
-            form.action = 'http://localhost:8086/login';
+            form.action = 'http://localhost:8082/login';
             form.method = 'POST';
             form.innerHTML = `<input type="hidden" name="username" value="${username}">
                              <input type="hidden" name="password" value="${password}">`;
