@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SQL Injection Demo</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Login Page</h2>
+        <!-- Form action should point to /login with POST method -->
+        <form action="/login" method="POST">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="password">Password:</label>
+            <input type="text" id="password" name="password" required>
+        
+            <p>Select Login Mode:</p>
+            <input type="radio" id="insecure" name="mode" value="insecure" checked>
+            <label for="insecure">Insecure Login (SQL Injection Vulnerable)</label><br>
+        
+            <input type="radio" id="secure" name="mode" value="secure">
+            <label for="secure">Secure Login (Safe)</label><br><br>
+        
+            <button type="submit">Login</button>
+        </form>
+        
+        <p>Want to change your password? <a href="/change-password.html">Click here</a></p>
+        <!-- Display error message if the 'error' query parameter is present -->
+        <p class="error">
+            <script>
+                const urlParams = new URLSearchParams(window.location.search);
+                const error = urlParams.get('error');
+                if (error) {
+                    document.write(decodeURIComponent(error));
+                }
+            </script>
+        </p>
+    </div>
+</body>
+</html>

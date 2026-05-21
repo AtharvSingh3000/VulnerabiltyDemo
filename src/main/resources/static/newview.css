@@ -1,0 +1,134 @@
+/* Basic reset for margin and padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styles */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Main container */
+div {
+    text-align: center;
+    max-width: 800px;
+    width: 100%;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Heading */
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Button for going back */
+.back-btn {
+    background-color: #007bff;
+    color: white;
+    font-size: 14px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+    background-color: #0056b3;
+}
+
+/* Card container */
+.card-container {
+    margin-top: 30px;
+}
+
+.card-list {
+    list-style: none;
+    padding: 0;
+}
+
+.card-item {
+    background-color: #fff;
+    margin-bottom: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.card-item:hover {
+    transform: translateY(-5px);
+}
+
+/* Card details styling */
+.card-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.card-header {
+    margin-bottom: 10px;
+}
+
+.card-holder {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.card-number {
+    font-size: 16px;
+    color: #555;
+}
+
+.card-footer {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.expiry-date,
+.cvv {
+    font-size: 14px;
+    color: #777;
+}
+
+/* Styling for mobile responsiveness */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .card-item {
+        padding: 15px;
+    }
+
+    .card-holder {
+        font-size: 16px;
+    }
+
+    .card-number {
+        font-size: 14px;
+    }
+
+    .expiry-date,
+    .cvv {
+        font-size: 12px;
+    }
+}

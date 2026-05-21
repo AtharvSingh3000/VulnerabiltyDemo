@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Injection Demo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            backdrop-filter: blur(10px);
+        }
+
+        .page-title {
+            text-align: center;
+            color: #1a2a6c;
+            font-size: 32px;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+        }
+
+        .forms-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .forms-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-section {
+            padding: 25px;
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .vulnerable-section {
+            background: linear-gradient(135deg, #fff5f5, #ffe5e5);
+            border: 2px solid #ffcdd2;
+        }
+
+        .secure-section {
+            background: linear-gradient(135deg, #f5fff5, #e5ffe5);
+            border: 2px solid #c8e6c9;
+        }
+
+        .form-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vulnerable-section h1 {
+            color: #c62828;
+        }
+
+        .secure-section h1 {
+            color: #2e7d32;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .vulnerable-section input[type="text"]:focus {
+            border-color: #ef5350;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(239, 83, 80, 0.2);
+        }
+
+        .secure-section input[type="text"]:focus {
+            border-color: #66bb6a;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 187, 106, 0.2);
+        }
+
+        .input-group i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .vulnerable-section button {
+            background: #ef5350;
+            color: white;
+        }
+
+        .vulnerable-section button:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+        }
+
+        .secure-section button {
+            background: #66bb6a;
+            color: white;
+        }
+
+        .secure-section button:hover {
+            background: #4caf50;
+            transform: translateY(-2px);
+        }
+
+        #commandMessage {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #f8f9fa;
+            border-left: 4px solid #666;
+        }
+
+        .alert {
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert-error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="page-title">Command Injection Demo</h2>
+        <div class="forms-container">
+            <!-- Vulnerable form -->
+            <div class="form-section vulnerable-section">
+                <form action="/login/execute" method="post" onsubmit="sendCommand(event, false)">
+                    <h1><i class="fas fa-exclamation-triangle"></i> Vulnerable Version</h1>
+                    <div class="input-group">
+                        <label for="command">Enter Command:</label>
+                        <input type="text" id="command" name="command" placeholder="Enter command here..." required>
+                        <!-- <i class="fas fa-terminal"></i> -->
+                    </div>
+                    <button type="submit">
+                        <i class="fas fa-play"></i>
+                        Execute Command
+                    </button>
+                </form>
+                <div class="alert alert-error" id="vulnerable-alert"></div>
+            </div>
+
+            <!-- Secure form -->
+            <div class="form-section secure-section">
+                <form action="/login/secure-execute" method="post" onsubmit="sendCommand(event, true)">
+                    <h1><i class="fas fa-shield-alt"></i> Secure Version</h1>
+                    <div class="input-group">
+                        <label for="command-secure">Enter Command:</label>
+                        <input type="text" id="command-secure" name="command" placeholder="Enter command here..." required>
+                        <!-- <i class="fas fa-terminal"></i> -->
+                    </div>
+                    <button type="submit">
+                        <i class="fas fa-check-circle"></i>
+                        Execute Command
+                    </button>
+                </form>
+                <div class="alert alert-success" id="secure-alert"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sendCommand(event, isSecure) {
+            event.preventDefault();
+            
+            const command = isSecure ? document.getElementById('command-secure').value : document.getElementById('command').value;
+            const url = isSecure ? '/login/secure-execute' : '/login/execute';
+            const alertElement = isSecure ? document.getElementById('secure-alert') : document.getElementById('vulnerable-alert');
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `command=${encodeURIComponent(command)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error executing command');
+                }
+                return response.text();
+            })
+            .then(data => {
+                alertElement.textContent = data;
+                alertElement.style.display = 'block';
+                setTimeout(() => {
+                    alertElement.style.display = 'none';
+                }, 5000);
+            })
+            .catch(error => {
+                alertElement.textContent = 'Error: ' + error.message;
+                alertElement.style.display = 'block';
+                setTimeout(() => {
+                    alertElement.style.display = 'none';
+                }, 5000);
+            });
+        }
+    </script>
+</body>
+</html>

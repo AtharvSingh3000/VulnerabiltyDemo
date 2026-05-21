@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Credit Cards</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --background: #f3f4f6;
+            --card-background: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+            --gradient-start: #4f46e5;
+            --gradient-end: #6366f1;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--background);
+            padding: 2rem;
+        }
+
+        h1 {
+            color: var(--text-primary);
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            display: inline-flex;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .back-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn:active {
+            transform: translateY(0);
+        }
+
+        .card-container {
+            padding: 1rem;
+        }
+
+        .card-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card-item {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 1rem;
+            padding: 1.5rem;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-details {
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .card-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 1rem;
+        }
+
+        .card-holder {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-number {
+    font-size: 1.125rem;
+    letter-spacing: 2px;
+    opacity: 0.9;
+    word-break: break-word; /* Break long words if they exceed the box width */
+    overflow-wrap: break-word; /* Support for breaking in older browsers */
+    white-space: normal; /* Allow wrapping onto new lines */
+    line-height: 1.5; /* Improve readability with proper spacing */
+    padding: 0.25rem 0; /* Add padding for better spacing inside the box */
+}
+
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+
+        .expiry-date, .cvv {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+
+        /* Card Number Masking */
+        .card-number {
+            font-family: monospace;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .card-list {
+                grid-template-columns: 1fr;
+            }
+
+            .card-item {
+                padding: 1.25rem;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-item {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Saved Credit Cards</h1>
+        <div class="container">
+            <button onclick="goBack()" class="back-btn">
+                ← Go Back to Add Credit Card
+            </button>
+            
+            <div class="card-container">
+                <ul id="creditCardList" class="card-list"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+       
+        function fetchCreditCards() {
+            const list = document.getElementById('creditCardList');
+            list.innerHTML = '<div class="loading">Loading credit cards...</div>';
+
+            fetch('http://10.180.5.184:8086/credit/newall')
+                .then(response => response.json())
+                .then(data => {
+                    list.innerHTML = ''; // Clear loading message
+                    
+                    if (data.length === 0) {
+                        list.innerHTML = `
+                            <div class="empty-state">
+                                <h3>No Credit Cards Found</h3>
+                                <p>Add your first credit card to get started</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    data.forEach(card => {
+                        const listItem = document.createElement('li');
+                        listItem.classList.add('card-item');
+                        listItem.innerHTML = `
+                            <div class="card-details">
+                                <div class="card-header">
+                                    <h3 class="card-holder">${card.cardHolderName || 'N/A'}</h3>
+                                
+                                    <p class="card-number">${(card.cardNumber)}</p>
+
+                                
+                                </div>
+                                <div class="card-footer">
+                                    <p class="expiry-date">Expires: ${card.expiryDate || 'N/A'}</p>
+                                    <p class="cvv">CVV:${card.cvv}</p>
+                                </div>
+                            </div>
+                        `;
+                        list.appendChild(listItem);
+                    });
+                })
+                .catch(error => {
+                    list.innerHTML = `
+                        <div class="empty-state">
+                            <h3>Error Loading Cards</h3>
+                            <p>Please try again later</p>
+                        </div>
+                    `;
+                    console.error('Error fetching cards:', error);
+                });
+        }
+
+        window.onload = fetchCreditCards;
+    </script>
+</body>
+</html>

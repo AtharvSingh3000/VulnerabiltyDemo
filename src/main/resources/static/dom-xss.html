@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM-Based XSS Demo</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --background: #f3f4f6;
+            --card-background: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background: var(--background);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-background);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-group.vulnerable {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .form-group.safe {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.15s ease;
+            margin-bottom: 1rem;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .button {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            font-size: 1rem;
+            color: white;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .button-primary {
+            background-color: var(--primary-color);
+        }
+
+        .button-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .button-vulnerable {
+            background-color: var(--danger-color);
+        }
+
+        .button-vulnerable:hover {
+            background-color: #dc2626;
+        }
+
+        .button-safe {
+            background-color: var(--success-color);
+        }
+
+        .button-safe:hover {
+            background-color: #059669;
+        }
+
+        .message-display {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            word-break: break-word;
+            min-height: 3.5rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+        }
+
+        .badge-vulnerable {
+            background-color: #fee2e2;
+            color: var(--danger-color);
+        }
+
+        .badge-safe {
+            background-color: #d1fae5;
+            color: var(--success-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>DOM-Based XSS Demo</h2>
+            <p class="subtitle">Test the difference between vulnerable and safe DOM manipulation</p>
+        </div>
+
+        <div class="form-group vulnerable">
+            <form id="domXssForm">
+                <label class="form-label">
+                    Enter a Message
+                    <span class="badge badge-vulnerable">Vulnerable</span>
+                </label>
+                <input type="text" id="domMessage" class="input-field" 
+                       placeholder="Try entering: <script>alert('XSS')</script>" required>
+                <button type="button" class="button button-vulnerable" 
+                        onclick="showDomMessage()">Show Vulnerable Message</button>
+            </form>
+            <div id="domDisplay" class="message-display"></div>
+        </div>
+
+        <div class="form-group safe">
+            <form id="safeDomXssForm">
+                <label class="form-label">
+                    Enter a Message
+                    <span class="badge badge-safe">Safe</span>
+                </label>
+                <input type="text" id="safeDomMessage" class="input-field" 
+                       placeholder="Enter any message safely" required>
+                <button type="button" class="button button-safe" 
+                        onclick="showSafeDomMessage()">Show Safe Message</button>
+            </form>
+            <div id="safeDomDisplay" class="message-display"></div>
+        </div>
+    </div>
+
+    <script>
+        // Vulnerable to DOM-based XSS
+        function showDomMessage() {
+            const message = document.getElementById('domMessage').value;
+            document.getElementById('domDisplay').innerHTML = `User message: ${message}`;
+        }
+
+        // Secure against DOM-based XSS
+        function showSafeDomMessage() {
+            const safeMessage = document.getElementById('safeDomMessage').value;
+            document.getElementById('safeDomDisplay').textContent = `User message: ${safeMessage}`;
+        }
+    </script>
+</body>
+</html>
